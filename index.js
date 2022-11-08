@@ -16,6 +16,15 @@ app.get('/', (req, res)=> {
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.fxdma7b.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+async function Doctor(){
+    try{
+        const serviceCollection = client.db('doctorG').collection('services');
+        const optionCollection = client.db('doctorG').collection('options');
+    }
+    finally{
+
+    }
+}
 
 
 app.listen(port, ()=>{

@@ -21,6 +21,12 @@ async function Doctor(){
         const serviceCollection = client.db('doctorG').collection('services');
         const optionCollection = client.db('doctorG').collection('options');
 
+        app.post('/jwt', (req, res) =>{
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRETE, { expiresIn: '1d'})
+            res.send({token})
+        })
+
         app.get('/options', async (req, res) => {
             const query = {}
             const cursor = optionCollection.find(query);

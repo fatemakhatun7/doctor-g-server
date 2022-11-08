@@ -20,11 +20,20 @@ async function Doctor(){
     try{
         const serviceCollection = client.db('doctorG').collection('services');
         const optionCollection = client.db('doctorG').collection('options');
+
+        app.get('/options', async (req, res) => {
+            const query = {}
+            const cursor = optionCollection.find(query);
+            const options = await cursor.toArray();
+            res.send(options);
+        });
     }
     finally{
 
     }
 }
+
+Doctor().catch(err => console.error(err));
 
 
 app.listen(port, ()=>{

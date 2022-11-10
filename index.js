@@ -20,13 +20,16 @@ async function Doctor(){
     try{
         const serviceCollection = client.db('doctorG').collection('services');
         const optionCollection = client.db('doctorG').collection('options');
+        const reviewCollection = client.db('doctorG').collection('reviews');
 
+        // jwt
         app.post('/jwt', (req, res) =>{
             const user = req.body;
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRETE, { expiresIn: '1d'})
             res.send({token})
         })
 
+        // home page three options
         app.get('/options', async (req, res) => {
             const query = {}
             const cursor = optionCollection.find(query);
@@ -34,6 +37,7 @@ async function Doctor(){
             res.send(options);
         });
 
+        // all services
         app.get('/services', async (req, res) => {
             const query = {}
             const cursor = serviceCollection.find(query);
@@ -46,6 +50,14 @@ async function Doctor(){
             const query = { _id: ObjectId(id) };
             const service = await serviceCollection.findOne(query);
             res.send(service);
+        });
+
+        // reviews
+        app.post('/reviews', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            const result = await reviewCollection.insertOne(user)
+            res.send(result);
         });
 
     }

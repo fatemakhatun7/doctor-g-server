@@ -16,7 +16,7 @@ app.get('/', (req, res)=> {
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.fxdma7b.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-function verifyJWT(req, res, next){
+/* function verifyJWT(req, res, next){
     const authHeader = req.headers.authorization;
 
     if(!authHeader){
@@ -31,7 +31,7 @@ function verifyJWT(req, res, next){
         req.decoded = decoded;
         next();
     })
-}
+} */
 
 async function Doctor(){
     try{
@@ -71,44 +71,35 @@ async function Doctor(){
 
         // reviews
 
-        app.get('/reviews', verifyJWT, async (req, res) => {
-            const decoded = req.decoded;
-            
-            if(decoded.email !== req.query.email){
-                res.status(403).send({message: 'unauthorized access'})
-            }
-
-            let query = {};
-            if (req.query.email) {
-                query = {
-                    email: req.query.email
-                }
-            }
+        app.get('/reviews', async (req, res) => {
+            const query = {}
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
         });
 
-        app.post('/reviews', verifyJWT, async (req, res) => {
+        app.post('/reviews', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review)
             res.send(result);
         });
         
-        app.patch('/reviews/:id', verifyJWT, async (req, res) => {
+        app.put('/reviews/:id', async (req, res) => {
             const id = req.params.id;
-            const status = req.body.status
+            const review = req.body;
             const query = { _id: ObjectId(id) }
+            const option = {upsert: true};
             const updatedDoc = {
                 $set:{
-                    status: status
+                    rating: review.rating,
+                    description: review.description
                 }
             }
-            const result = await reviewCollection.updateOne(query, updatedDoc);
+            const result = await reviewCollection.updateOne(query, updatedDoc, option);
             res.send(result);
         })
 
-        app.delete('/reviews/:id', verifyJWT, async (req, res) => {
+        app.delete('/reviews/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await reviewCollection.deleteOne(query);
